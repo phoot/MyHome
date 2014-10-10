@@ -2,6 +2,7 @@ package fr.oxilea.myhome;
 
 import android.app.Activity;
 import android.app.ListActivity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,6 +13,18 @@ import android.widget.Toast;
 
 
 public class MyActivity extends ListActivity {
+
+    // global message Format
+    // Packet head - Total length (2 bytes) - ID - Command - Parameter - Parity
+    // 0x55 0xaa - 0x00 0x?? - 0x01 - 0x?? .. - 0x?? .. -0x??
+    // TCP over network send full frame
+    // mdp hex => 62 37 65 62 38
+    // mdp str =>  "b7eb8"
+    // mdp command => mdp (bytes) + 0x0d, 0x0a
+    public static final byte[] STATUS_RELAY_MESSAGE={0x55, (byte)0xaa, 0x00, 0x02, 0x00, 0x0a, 0x0c };
+    public static final byte[] CDE_ON_RELAY_MESSAGE={ 0x55, (byte)0xaa, 0x00, 0x03, 0x00, 0x02, 0x01, 0x06 };
+    public static final byte[] CDE_OFF_RELAY_MESSAGE={0x55, (byte)0xaa, 0x00, 0x03, 0x00, 0x01, 0x01, 0x05 };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,5 +61,22 @@ public class MyActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         Toast.makeText(this, "Position : " + position, Toast.LENGTH_LONG).show();
+
+        // send relay command
+        new SetRelayOnTask().execute();
     }
+
+    // TCP connection should be started in a new thread
+    class SetRelayOnTask extends AsyncTask<Void,Void,String> {
+
+        public String doInBackground(Void... params) {
+            // connect socket and send device password
+            TCPClient sTcpClient = new TCPClient(CDE_ON_RELAY_MESSAGE);
+            sTcpClient = new TCPClient(CDE_OFF_RELAY_MESSAGE);
+
+            String ret="ok";
+            return ret;
+        }
+    }
+
 }
