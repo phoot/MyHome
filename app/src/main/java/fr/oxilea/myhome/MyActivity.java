@@ -18,12 +18,20 @@ public class MyActivity extends ListActivity {
     // Packet head - Total length (2 bytes) - ID - Command - Parameter - Parity
     // 0x55 0xaa - 0x00 0x?? - 0x01 - 0x?? .. - 0x?? .. -0x??
     // TCP over network send full frame
-    // mdp hex => 62 37 65 62 38
-    // mdp str =>  "b7eb8"
-    // mdp command => mdp (bytes) + 0x0d, 0x0a
+
     public static final byte[] STATUS_RELAY_MESSAGE={0x55, (byte)0xaa, 0x00, 0x02, 0x00, 0x0a, 0x0c };
     public static final byte[] CDE_ON_RELAY_MESSAGE={ 0x55, (byte)0xaa, 0x00, 0x03, 0x00, 0x02, 0x01, 0x06 };
     public static final byte[] CDE_OFF_RELAY_MESSAGE={0x55, (byte)0xaa, 0x00, 0x03, 0x00, 0x01, 0x01, 0x05 };
+
+    // mdp hex => 62 37 65 62 38
+    // mdp str =>  "b7eb8"
+    // mdp command => mdp (bytes) + 0x0d, 0x0a
+    public static final byte[] PASSWORD_RELAY_MESSAGE={0x62, 0x37, 0x65, 0x62, 0x38, 0x0d, 0x0a};
+
+
+    // Temp default definition server port
+    public static String SERVER_IP = "192.168.2.23"; //your computer IP address
+    public static int SERVER_PORT = 8899;
 
 
     @Override
@@ -71,9 +79,13 @@ public class MyActivity extends ListActivity {
 
         public String doInBackground(Void... params) {
             // connect socket and send device password
-            TCPClient sTcpClient = new TCPClient(CDE_ON_RELAY_MESSAGE);
-            sTcpClient = new TCPClient(CDE_OFF_RELAY_MESSAGE);
+            TCPClient sTcpClient = new TCPClient(SERVER_IP,SERVER_PORT );
 
+            // send password over TCP connection
+            sTcpClient.SendOverTCP(PASSWORD_RELAY_MESSAGE);
+            sTcpClient.SendOverTCP(CDE_ON_RELAY_MESSAGE);
+            sTcpClient.SendOverTCP(CDE_OFF_RELAY_MESSAGE);
+            sTcpClient.CloseSocket();
             String ret="ok";
             return ret;
         }

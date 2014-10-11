@@ -12,11 +12,6 @@ import java.net.Socket;
 
 public class TCPClient {
 
-    public static final byte[] PASSWORD_RELAY_MESSAGE={0x62, 0x37, 0x65, 0x62, 0x38, 0x0d, 0x0a};
-
-    public static String SERVER_IP = "192.168.2.23"; //your computer IP address
-    public static int SERVER_PORT = 8899;
-
     // used to send messages
     private PrintStream mBufferOutPwd;
     private PrintStream mBufferOut;
@@ -29,14 +24,23 @@ public class TCPClient {
 
 
     /**
-     * Constructor of the class. OnMessagedReceived listens for the messages received from server
+     * Constructor of the class.
+     * create a Socket
      */
-    public TCPClient(byte[] str2send) {
+    public TCPClient(String server, int port) {
         try {
             //create a socket to make the connection with the server
             Log.i("TCP Client", "New Socket...");
-            socket = new Socket(SERVER_IP, SERVER_PORT);
+            socket = new Socket(server, port);
+        }
+        catch (Exception e) {
+            Log.e("TCP", "S: Error", e);
+        }
+    }
+    public String SendOverTCP(byte[] str2send) {
+        String retStr= "";
 
+        try {
             // set a read timeout (ms)
             socket.setSoTimeout(500);
 
@@ -50,17 +54,30 @@ public class TCPClient {
             mBufferOut.write(str2send);
             String strRead = mBufferIn.readLine();
             Log.i("TCP Client read", strRead);
-
+            retStr=strRead;
         }
         catch (Exception e) {
             Log.e("TCP", "S: Error", e);
+            retStr= "";
+        }finally {
+            return retStr;
         }
-        // close socket !!!
+
+    }
+
+    public Boolean CloseSocket() {
+
+        Boolean retStatus= true;
+
         Log.i("TCP Client", "socket closed...");
         try {
+            // close socket !!!
             socket.close();
         } catch (IOException e) {
             Log.e("TCP", "Socket close: Error", e);
+            retStatus= false;
+        } finally {
+            return retStatus;
         }
     }
 }
