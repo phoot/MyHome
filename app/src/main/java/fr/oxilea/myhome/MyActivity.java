@@ -22,6 +22,7 @@ public class MyActivity extends ListActivity {
     public static final byte[] STATUS_RELAY_MESSAGE={0x55, (byte)0xaa, 0x00, 0x02, 0x00, 0x0a, 0x0c };
     public static final byte[] CDE_ON_RELAY_MESSAGE={ 0x55, (byte)0xaa, 0x00, 0x03, 0x00, 0x02, 0x01, 0x06 };
     public static final byte[] CDE_OFF_RELAY_MESSAGE={0x55, (byte)0xaa, 0x00, 0x03, 0x00, 0x01, 0x01, 0x05 };
+    public static final byte[] CDE_SWITCH_RELAY_MESSAGE={0x55, (byte)0xaa, 0x00, 0x03, 0x00, 0x03, 0x01, 0x07 };
 
     // mdp hex => 62 37 65 62 38
     // mdp str =>  "b7eb8"
@@ -71,13 +72,27 @@ public class MyActivity extends ListActivity {
         Toast.makeText(this, "Position : " + position, Toast.LENGTH_LONG).show();
 
         // send relay command
-        new SetRelayOnTask().execute();
+        new SetRelayOnTask(position).execute();
     }
 
     // TCP connection should be started in a new thread
     class SetRelayOnTask extends AsyncTask<Void,Void,String> {
 
+        int selectedIndex;
+
+        // add new constructor with param
+        public SetRelayOnTask(int index) {
+            super();
+            // set the index of the request
+            selectedIndex=index;
+        }
+
         public String doInBackground(Void... params) {
+
+            // retrieve the object definition
+            ConnectedObjects currentDevice=new ConnectedObjects();
+            String currentDeviceDefinition[] = currentDevice.GetObjectDetails(selectedIndex);
+
             // connect socket and send device password
             TCPClient sTcpClient = new TCPClient(SERVER_IP,SERVER_PORT );
 
@@ -86,16 +101,17 @@ public class MyActivity extends ListActivity {
 
             // check if password is correct (return OK)
             if (retStatus.equals("OK")) {
-                sTcpClient.SendOverTCP(CDE_ON_RELAY_MESSAGE, false);
-
                 // check if pulse command
-                if (true) {
+                if (currentDeviceDefinition[2].equals("0")) {
+                    sTcpClient.SendOverTCP(CDE_ON_RELAY_MESSAGE, true);
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    sTcpClient.SendOverTCP(CDE_OFF_RELAY_MESSAGE, false);
+                    sTcpClient.SendOverTCP(CDE_OFF_RELAY_MESSAGE, true);
+                }else{
+                    sTcpClient.SendOverTCP(CDE_SWITCH_RELAY_MESSAGE, true);
                 }
                 sTcpClient.CloseSocket();
             }

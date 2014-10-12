@@ -57,7 +57,7 @@ public class TCPClient {
 
                 // keep only valid char read
                 int i=0;
-                while(cRead[i]!='\0'){i++;}; // the last char is always \0 as only ten char are read
+                while(cRead[i]!='\0'){i++;}; // the last char is always \0 as only 10 chars are read
                 Log.i("TCP Client read", String.valueOf(cRead,0,i));
                 retStr = String.valueOf(cRead,0,i);
             }
