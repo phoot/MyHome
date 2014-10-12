@@ -82,10 +82,23 @@ public class MyActivity extends ListActivity {
             TCPClient sTcpClient = new TCPClient(SERVER_IP,SERVER_PORT );
 
             // send password over TCP connection
-            sTcpClient.SendOverTCP(PASSWORD_RELAY_MESSAGE);
-            sTcpClient.SendOverTCP(CDE_ON_RELAY_MESSAGE);
-            sTcpClient.SendOverTCP(CDE_OFF_RELAY_MESSAGE);
-            sTcpClient.CloseSocket();
+            String retStatus=sTcpClient.SendOverTCP(PASSWORD_RELAY_MESSAGE, true);
+
+            // check if password is correct (return OK)
+            if (retStatus.equals("OK")) {
+                sTcpClient.SendOverTCP(CDE_ON_RELAY_MESSAGE, false);
+
+                // check if pulse command
+                if (true) {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    sTcpClient.SendOverTCP(CDE_OFF_RELAY_MESSAGE, false);
+                }
+                sTcpClient.CloseSocket();
+            }
             String ret="ok";
             return ret;
         }

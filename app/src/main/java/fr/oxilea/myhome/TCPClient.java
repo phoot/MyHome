@@ -13,10 +13,8 @@ import java.net.Socket;
 public class TCPClient {
 
     // used to send messages
-    private PrintStream mBufferOutPwd;
     private PrintStream mBufferOut;
     // used to read messages from the server
-    private BufferedReader mBufferInPwd;
     private BufferedReader mBufferIn;
 
     // reference to the created socket
@@ -37,12 +35,12 @@ public class TCPClient {
             Log.e("TCP", "S: Error", e);
         }
     }
-    public String SendOverTCP(byte[] str2send) {
+    public String SendOverTCP(byte[] str2send, Boolean expectResponse) {
         String retStr= "";
 
         try {
             // set a read timeout (ms)
-            socket.setSoTimeout(500);
+            socket.setSoTimeout(100);
 
             Log.i("TCP Client", "BufferOut...");
             mBufferOut = new PrintStream(socket.getOutputStream(), true);
@@ -52,9 +50,17 @@ public class TCPClient {
 
             Log.i("TCP Client", "write...");
             mBufferOut.write(str2send);
-            String strRead = mBufferIn.readLine();
-            Log.i("TCP Client read", strRead);
-            retStr=strRead;
+            if(expectResponse) {
+                Log.i("TCP Client read ","response");
+                char cRead[]={'\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0'};
+                mBufferIn.read(cRead,0,10);
+
+                // keep only valid char read
+                int i=0;
+                while(cRead[i]!='\0'){i++;}; // the last char is always \0 as only ten char are read
+                Log.i("TCP Client read", String.valueOf(cRead,0,i));
+                retStr = String.valueOf(cRead,0,i);
+            }
         }
         catch (Exception e) {
             Log.e("TCP", "S: Error", e);
