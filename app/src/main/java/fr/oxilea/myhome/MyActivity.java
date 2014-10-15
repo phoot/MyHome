@@ -44,7 +44,7 @@ public class MyActivity extends ListActivity {
         // add item in that array to add element in the list
         // don't forget to add corresponding icon in tab_images_pour_la_liste
         // retrieve the object definition
-        ConnectedObjects currentDevice=new ConnectedObjects();
+        ConnectedObject currentDevice=new ConnectedObject();
 
         String[] values = new String[] { currentDevice.GetObjectDetails(0)[ObjectName], currentDevice.GetObjectDetails(1)[ObjectName]};
 
@@ -76,7 +76,7 @@ public class MyActivity extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
 
         // retrieve the object definition, (corresponding to the list Item click (line position)
-        ConnectedObjects currentDevice=new ConnectedObjects();
+        ConnectedObject currentDevice=new ConnectedObject();
         String currentDeviceDefinition[] = currentDevice.GetObjectDetails(position);
 
         // Display feedback to the user, ie the object name
@@ -102,7 +102,7 @@ public class MyActivity extends ListActivity {
 
 
             // retrieve the object definition
-            ConnectedObjects currentDevice=new ConnectedObjects();
+            ConnectedObject currentDevice=new ConnectedObject();
             String currentDeviceDefinition[] = currentDevice.GetObjectDetails(selectedIndex);
 
             // connect socket and send device password
