@@ -25,9 +25,9 @@ public class MyActivity extends ListActivity {
     public static final byte[] CDE_SWITCH_RELAY_MESSAGE={0x55, (byte)0xaa, 0x00, 0x03, 0x00, 0x03, 0x01, 0x07 };
 
     // psw hex => 62 37 65 62 38
-    // psw str =>  "b7eb8"
+    // psw str =>  "xxxxx"
     // psw command => psw (bytes) + 0x0d, 0x0a
-    public byte[] PASSWORD_RELAY_MESSAGE={0x62, 0x37, 0x65, 0x62, 0x38, 0x0d, 0x0a};
+    public byte[] PASSWORD_RELAY_MESSAGE={0x0, 0x0, 0x0, 0x0, 0x0, 0x0d, 0x0a};
 
     public static final int ObjectName=0;
     public static final int index=1;
@@ -65,9 +65,13 @@ public class MyActivity extends ListActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        switch (item.getItemId()){
+            case R.id.action_settings:
             return true;
+
+            case R.id.action_about:
+                // create about activity
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -105,11 +109,22 @@ public class MyActivity extends ListActivity {
             ConnectedObject currentDevice=new ConnectedObject();
             String currentDeviceDefinition[] = currentDevice.GetObjectDetails(selectedIndex);
 
-            // connect socket and send device password
-            //TCPClient sTcpClient = new TCPClient(SERVER_IP,SERVER_PORT );
+            // connect socket on device IP address and Port
             TCPClient sTcpClient = new TCPClient(currentDeviceDefinition[networkIpAddress],Integer.parseInt(currentDeviceDefinition[networkPort]) );
 
-            // send password over TCP connection
+            // send password over TCP socket just connected
+            // get the password and format the command for the device
+            String pwd = currentDeviceDefinition[devicePswd];
+            int pwdLength = pwd.length();
+            int i=0;
+            while (i < pwdLength) {
+                PASSWORD_RELAY_MESSAGE[i]=(byte)pwd.charAt(i);
+                i++;
+            }
+            // psw end with 0x0d, 0x0a
+            PASSWORD_RELAY_MESSAGE[i++]=(byte)0x0d;
+            PASSWORD_RELAY_MESSAGE[i]=(byte)0x0a;
+
             String retStatus=sTcpClient.SendOverTCP(PASSWORD_RELAY_MESSAGE, true);
 
             // check if password is correct (return OK)

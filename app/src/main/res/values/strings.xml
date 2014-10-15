@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">MyHome</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-
+    <string name="action_about_txt">About</string>
+    <string name="about_text">My Home\n developped by Oxylea\n 2014</string>
 </resources>

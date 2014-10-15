@@ -6,8 +6,8 @@ package fr.oxilea.myhome;
 public class ConnectedObject {
 
     // data structure: ObjectName | index | type (pulse 0 or On/off 1 | localIpAddress | local port | networkIpAddress | networkPort | localWifiName | devicePswd
-    String connectedObjectList [][]={   {"Portail", "0", "0","phoot.hd.free.fr","8899","xxx"},
-                                        {"Prise", "1", "1","phoot.hd.free.fr","8899","xxx"}};
+    String connectedObjectList [][]={   {"Portail", "0", "0","phoot.hd.free.fr","8899","b7eb8"},
+                                        {"Prise", "1", "1","phoot.hd.free.fr","8899","b7eb8"}};
 
     /**
      * Constructor of the class.
