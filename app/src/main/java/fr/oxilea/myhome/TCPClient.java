@@ -39,8 +39,8 @@ public class TCPClient {
         String retStr= "";
 
         try {
-            // set a read timeout (ms)
-            socket.setSoTimeout(100);
+            // set a read timeout (ms) only if wait for EOL on socket read
+            // socket.setSoTimeout(500);
 
             Log.i("TCP Client", "BufferOut...");
             mBufferOut = new PrintStream(socket.getOutputStream(), true);
@@ -53,6 +53,12 @@ public class TCPClient {
             if(expectResponse) {
                 Log.i("TCP Client read ","response");
                 char cRead[]={'\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0'};
+                // wait a little bit before read status
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 mBufferIn.read(cRead,0,10);
 
                 // keep only valid char read

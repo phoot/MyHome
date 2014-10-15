@@ -24,24 +24,29 @@ public class MyActivity extends ListActivity {
     public static final byte[] CDE_OFF_RELAY_MESSAGE={0x55, (byte)0xaa, 0x00, 0x03, 0x00, 0x01, 0x01, 0x05 };
     public static final byte[] CDE_SWITCH_RELAY_MESSAGE={0x55, (byte)0xaa, 0x00, 0x03, 0x00, 0x03, 0x01, 0x07 };
 
-    // mdp hex => 62 37 65 62 38
-    // mdp str =>  "b7eb8"
-    // mdp command => mdp (bytes) + 0x0d, 0x0a
-    public static final byte[] PASSWORD_RELAY_MESSAGE={0x62, 0x37, 0x65, 0x62, 0x38, 0x0d, 0x0a};
+    // psw hex => 62 37 65 62 38
+    // psw str =>  "b7eb8"
+    // psw command => psw (bytes) + 0x0d, 0x0a
+    public byte[] PASSWORD_RELAY_MESSAGE={0x62, 0x37, 0x65, 0x62, 0x38, 0x0d, 0x0a};
 
-
-    // Temp default definition server port
-    public static String SERVER_IP = "192.168.2.23"; //your computer IP address
-    public static int SERVER_PORT = 8899;
+    public static final int ObjectName=0;
+    public static final int index=1;
+    public static final int type=2;
+    public static final int networkIpAddress=3;
+    public static final int networkPort=4;
+    public static final int devicePswd=5;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // add item in that array to add elment in the list
+        // add item in that array to add element in the list
         // don't forget to add corresponding icon in tab_images_pour_la_liste
-        String[] values = new String[] { "Portail", "Lampe Salon" };
+        // retrieve the object definition
+        ConnectedObjects currentDevice=new ConnectedObjects();
+
+        String[] values = new String[] { currentDevice.GetObjectDetails(0)[ObjectName], currentDevice.GetObjectDetails(1)[ObjectName]};
 
         MonAdaptateurDeListe adaptateur = new MonAdaptateurDeListe(this, values);
         setListAdapter(adaptateur);
@@ -69,7 +74,13 @@ public class MyActivity extends ListActivity {
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        Toast.makeText(this, "Position : " + position, Toast.LENGTH_LONG).show();
+
+        // retrieve the object definition, (corresponding to the list Item click (line position)
+        ConnectedObjects currentDevice=new ConnectedObjects();
+        String currentDeviceDefinition[] = currentDevice.GetObjectDetails(position);
+
+        // Display feedback to the user, ie the object name
+        Toast.makeText(this, currentDeviceDefinition[ObjectName], Toast.LENGTH_SHORT).show();
 
         // send relay command
         new SetRelayOnTask(position).execute();
@@ -89,12 +100,14 @@ public class MyActivity extends ListActivity {
 
         public String doInBackground(Void... params) {
 
+
             // retrieve the object definition
             ConnectedObjects currentDevice=new ConnectedObjects();
             String currentDeviceDefinition[] = currentDevice.GetObjectDetails(selectedIndex);
 
             // connect socket and send device password
-            TCPClient sTcpClient = new TCPClient(SERVER_IP,SERVER_PORT );
+            //TCPClient sTcpClient = new TCPClient(SERVER_IP,SERVER_PORT );
+            TCPClient sTcpClient = new TCPClient(currentDeviceDefinition[networkIpAddress],Integer.parseInt(currentDeviceDefinition[networkPort]) );
 
             // send password over TCP connection
             String retStatus=sTcpClient.SendOverTCP(PASSWORD_RELAY_MESSAGE, true);
@@ -102,10 +115,10 @@ public class MyActivity extends ListActivity {
             // check if password is correct (return OK)
             if (retStatus.equals("OK")) {
                 // check if pulse command
-                if (currentDeviceDefinition[2].equals("0")) {
+                if (currentDeviceDefinition[type].equals("0")) {
                     sTcpClient.SendOverTCP(CDE_ON_RELAY_MESSAGE, true);
                     try {
-                        Thread.sleep(500);
+                        Thread.sleep(300);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

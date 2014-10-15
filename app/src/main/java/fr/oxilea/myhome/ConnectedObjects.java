@@ -5,9 +5,11 @@ package fr.oxilea.myhome;
  */
 public class ConnectedObjects {
 
-    // data structure: ObjectName | index | type (pulse 0 or On/off 1 | localIpAddress | local port | networkIpAddress | networkPort | localWifiName | devicePswd
-    String connectedObjectList [][]={{"Portail", "0", "0","192.168.2.23","8899","http://phoot.hd.free.fr","8899", "PhTNetwork","xxx"},
-            {"Prise", "1", "1","192.168.2.23","8899","http://phoot.hd.free.fr","8899", "PhTNetwork", "xxx"}};
+
+
+    // data structure: ObjectName | index | type (pulse 0 or On/off 1 | networkIpAddress | networkPort | devicePswd
+    String connectedObjectList [][]={   {"Portail", "0", "0","your.ip.add","8899", "xxx"},
+                                        {"Prise", "1", "1","your.ip.add","8899","xxx"}};
 
     /**
      * Constructor of the class.
