@@ -81,28 +81,54 @@ public class DeviceBdd {
         values.put(COL_OBJECT_PSW, myConnectedObjet.GetObjectPassword());
         values.put(COL_OBJECT_ICON, myConnectedObjet.GetObjectIconType());
 
-        // id start at one where list position start à 0
-        id++;
-        return bdd.update(SETTING_TABLE, values, ID + " = " +id, null);
+        return bdd.update(SETTING_TABLE, values, COL_OBJECT_INDEX + " = " +id, null);
     }
 
     public int removeObjectWithID(int id){
-        // id start at 1 in BDD and 0 in list so add one to search in BDD
-        id++;
-
-        //Remove Object from BDD using the ID
-        return bdd.delete(SETTING_TABLE, ID + " = " +id, null);
+        //Remove Object from BDD using the IDEX
+        return bdd.delete(SETTING_TABLE, COL_OBJECT_INDEX + " = " +id, null);
     }
 
     public ConnectedObject getObjectWithId(int id){
         // get full object definition
-        // id start at 1 in BDD and 0 in list so add one to search in BDD
-        id++;
-
-        Cursor c = bdd.query(SETTING_TABLE, new String[] {ID, COL_OBJECT_NAME, COL_OBJECT_INDEX, COL_OBJECT_CDETYPE, COL_OBJECT_IP_ADDRESS, COL_OBJECT_IP_PORT, COL_OBJECT_PSW, COL_OBJECT_ICON}, ID + " LIKE \"" + id +"\"", null, null, null, null);
+        Cursor c = bdd.query(SETTING_TABLE, new String[] {ID, COL_OBJECT_NAME, COL_OBJECT_INDEX, COL_OBJECT_CDETYPE, COL_OBJECT_IP_ADDRESS, COL_OBJECT_IP_PORT, COL_OBJECT_PSW, COL_OBJECT_ICON}, COL_OBJECT_INDEX + " LIKE \"" + id +"\"", null, null, null, null);
         return cursorToConnectedObject(c);
     }
 
+
+    public void ReorderObjectInBdd()
+    {
+        // refactor INDEX
+        // read<all database row and set the index with the row number
+        // get the number<of row
+        Cursor c = this.getBDD().rawQuery("select * from settingTable",null);
+        int numRows = c.getCount();
+        c.moveToFirst();
+        ConnectedObject myObj= new ConnectedObject();
+        int i=0;
+        while (i < numRows)
+        {
+            //retrieve the full object from database
+            //set info from Cursor
+            myObj.SetObjectName(c.getString(NUM_COL_OBJECT_NAME));
+            myObj.SetObjectCdeType(c.getString(NUM_COL_OBJECT_CDETYPE));
+            myObj.SetObjectIpAddress(c.getString(NUM_COL_OBJECT_IP_ADDRESS));
+            myObj.SetObjectIpPort(c.getString(NUM_COL_OBJECT_IP_PORT));
+            myObj.SetObjectPassword(c.getString(NUM_COL_OBJECT_PSW));
+            myObj.SetObjectIconType(c.getString(NUM_COL_OBJECT_ICON));
+
+            // set the new index using the old one
+            myObj.SetObjectIndex(String.valueOf(i));
+
+            // update in database with new index at the cursor
+            this.updateObject(Integer.parseInt(c.getString(NUM_COL_OBJECT_INDEX)), myObj);
+
+            // move to the next row
+            c.moveToNext();
+            i++;
+        }
+
+    }
     //convert cursor to ConnectedObject
     private ConnectedObject cursorToConnectedObject(Cursor c){
         // if no element found, return null
@@ -111,6 +137,7 @@ public class DeviceBdd {
 
         //else set to the first element
         c.moveToFirst();
+
         //create a ConnectedObject
         ConnectedObject myObj = new ConnectedObject();
 

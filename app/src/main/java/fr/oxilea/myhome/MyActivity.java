@@ -3,15 +3,12 @@ package fr.oxilea.myhome;
 import android.app.ActionBar;
 import android.app.ListActivity;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.regex.Pattern;
@@ -168,9 +165,6 @@ public class MyActivity extends ListActivity {
 
         @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-
-        Log.i("Position", String.valueOf(position));
-        Log.i("Id", String.valueOf(id));
 
         if (editMode)
         {

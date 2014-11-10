@@ -2,6 +2,7 @@ package fr.oxilea.myhome;
 
 
 import android.app.Activity;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -26,6 +27,7 @@ public class ActivitySetting extends Activity {
 
         // manage spinner for icon type
         Spinner spinner = (Spinner) findViewById(R.id.spinnerIcon);
+        String iconType="0";
 
         if (currentEditedId != -1){
             // this is an update of an already defined setting, should retrieve data from BDD
@@ -56,9 +58,7 @@ public class ActivitySetting extends Activity {
             myTextView.setText(myObject.GetObjectPassword());
 
             // set the current spinner value
-            String iconType = myObject.GetObjectIconType();
-            int iconIndex = Integer.parseInt(iconType);
-            spinner.setSelection(iconIndex);
+            iconType = myObject.GetObjectIconType();
         }
 
         // Create an ArrayAdapter using the string array and a default spinner layout
@@ -70,52 +70,72 @@ public class ActivitySetting extends Activity {
 
         // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
+
+        int iconIndex = Integer.parseInt(iconType);
+        spinner.setSelection(iconIndex);
     }
 
 
     // save or update device from BDD
     public void saveDeviceSetting(View v)
     {
-            // get all inputs
-            TextView myTextView = (TextView) findViewById(R.id.editTextDevice);
-            String deviceName = myTextView.getText().toString();
+        // get all inputs
+        TextView myTextView = (TextView) findViewById(R.id.editTextDevice);
+        String deviceName = myTextView.getText().toString();
 
-            Switch s = (Switch)findViewById(R.id.switchPulse);
-            String deviceCdeType = "0";
-            if (s.isChecked())
-                deviceCdeType="1";
+        Switch s = (Switch)findViewById(R.id.switchPulse);
+        String deviceCdeType = "0";
+        if (s.isChecked())
+            deviceCdeType="1";
 
-            myTextView = (TextView) findViewById(R.id.editTextDeviceAdd);
-            String deviceDeviceAdd = myTextView.getText().toString();
+        myTextView = (TextView) findViewById(R.id.editTextDeviceAdd);
+        String deviceDeviceAdd = myTextView.getText().toString();
 
-            myTextView = (TextView) findViewById(R.id.editTextDevicePort);
-            String deviceDevicePort = myTextView.getText().toString();
+        myTextView = (TextView) findViewById(R.id.editTextDevicePort);
+        String deviceDevicePort = myTextView.getText().toString();
 
-            myTextView = (TextView) findViewById(R.id.editSettingPsw);
-            String deviceDevicePsw = myTextView.getText().toString();
+        myTextView = (TextView) findViewById(R.id.editSettingPsw);
+        String deviceDevicePsw = myTextView.getText().toString();
 
-            // manage spinner for icon type
-            Spinner spinner = (Spinner) findViewById(R.id.spinnerIcon);
-            String deviceDeviceIcon = String.valueOf(spinner.getSelectedItemPosition());
+        // manage spinner for icon type
+        Spinner spinner = (Spinner) findViewById(R.id.spinnerIcon);
+        String deviceDeviceIcon = String.valueOf(spinner.getSelectedItemPosition());
 
-            DeviceBdd mySettingBdd = new DeviceBdd(this);
-            mySettingBdd.open();
-            ConnectedObject myObject= new ConnectedObject(deviceName, deviceCdeType, deviceCdeType, deviceDeviceAdd, deviceDevicePort, deviceDevicePsw, deviceDeviceIcon);
+        DeviceBdd mySettingBdd = new DeviceBdd(this);
+        mySettingBdd.open();
+
+        Cursor c = mySettingBdd.getBDD().rawQuery("select * from settingTable",null);
+        int numRows;
+
         if (currentEditedId == -1) {
-            // this is a new object creation}
-            mySettingBdd.insertObject(myObject);
+            // save new device with Index value equals numRows
+            numRows = c.getCount();
         }
-            else
+        else
         {
-            // this is an update of an already defined setting
-            mySettingBdd.updateObject(currentEditedId, myObject);
+            // keep current index
+            numRows = currentEditedId;
         }
 
-        // close BDD
-        mySettingBdd.close();
+        String deviceIndex = String.valueOf(numRows);
 
-        // exit setting activity
-        finish();
+        ConnectedObject myObject= new ConnectedObject(deviceName, deviceIndex, deviceCdeType, deviceDeviceAdd, deviceDevicePort, deviceDevicePsw, deviceDeviceIcon);
+
+        if (currentEditedId == -1) {
+                // this is a new object creation}
+                mySettingBdd.insertObject(myObject);
+            }
+                else
+            {
+                // this is an update of an already defined setting
+                mySettingBdd.updateObject(currentEditedId, myObject);
+            }
+
+            // close BDD
+            mySettingBdd.close();
+
+            // exit setting activity
+            finish();
     }
 
 
@@ -127,6 +147,9 @@ public class ActivitySetting extends Activity {
             mySettingBdd.open();
 
             mySettingBdd.removeObjectWithID(currentEditedId);
+
+            // update all database device index
+            mySettingBdd.ReorderObjectInBdd();
 
             // close BDD
             mySettingBdd.close();

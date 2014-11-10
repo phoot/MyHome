@@ -2,7 +2,6 @@ package fr.oxilea.myhome;
 
 
 
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,11 +27,9 @@ public class TCPClient {
     public TCPClient(String server, int port) {
         try {
             //create a socket to make the connection with the server
-            Log.i("TCP Client", "New Socket...");
             socket = new Socket(server, port);
         }
         catch (Exception e) {
-            Log.e("TCP", "S: Error", e);
         }
     }
     public String SendOverTCP(byte[] str2send, Boolean expectResponse) {
@@ -42,16 +39,12 @@ public class TCPClient {
             // set a read timeout (ms) only if wait for EOL on socket read
             // socket.setSoTimeout(500);
 
-            Log.i("TCP Client", "BufferOut...");
             mBufferOut = new PrintStream(socket.getOutputStream(), true);
 
-            Log.i("TCP Client", "BufferIn...");
             mBufferIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            Log.i("TCP Client", "write...");
             mBufferOut.write(str2send);
             if(expectResponse) {
-                Log.i("TCP Client read ","response");
                 char cRead[]={'\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0'};
                 // wait a little bit before read status
                 try {
@@ -63,33 +56,26 @@ public class TCPClient {
 
                 // keep only valid char read
                 int i=0;
-                while(cRead[i]!='\0'){i++;}; // the last char is always \0 as only 10 chars are read
-                Log.i("TCP Client read", String.valueOf(cRead,0,i));
+                while(cRead[i]!='\0'){i++;} // the last char is always \0 as only 10 chars are read
                 retStr = String.valueOf(cRead,0,i);
             }
         }
         catch (Exception e) {
-            Log.e("TCP", "S: Error", e);
             retStr= "";
-        }finally {
-            return retStr;
         }
-
+        return retStr;
     }
 
     public Boolean CloseSocket() {
 
         Boolean retStatus= true;
 
-        Log.i("TCP Client", "socket closed...");
         try {
             // close socket !!!
             socket.close();
         } catch (IOException e) {
-            Log.e("TCP", "Socket close: Error", e);
             retStatus= false;
-        } finally {
-            return retStatus;
         }
+        return retStatus;
     }
 }
