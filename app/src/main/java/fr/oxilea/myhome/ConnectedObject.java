@@ -1,24 +1,101 @@
 package fr.oxilea.myhome;
 
-/**
- * Created by philippe on 10/10/2014.
- */
+
 public class ConnectedObject {
 
-    // data structure: ObjectName | index | type (pulse 0 or On/off 1 | localIpAddress | local port | networkIpAddress | networkPort | localWifiName | devicePswd
-    String connectedObjectList [][]={   {"Portail", "0", "0","phoot.hd.free.fr","8899","b7eb8"},
-                                        {"Prise", "1", "1","phoot.hd.free.fr","8899","b7eb8"}};
+    // data structure: ObjectName | index | cdeType (pulse 0 or On/off 1 | networkIpAddress | networkPort | devicePswd | iconType
+
+    private int id;
+    private String objectName;
+    private String objectIndex;
+    private String cdeType;
+    private String ipAddress;
+    private String ipPort;
+    private String password;
+    private String iconType;
+
 
     /**
      * Constructor of the class.
      */
     public ConnectedObject(){
-        // currently objects are declared in a array
-        // to be modified as a read from local database
+        // default, create only pointer to ConnectedObject
 
     }
 
-    String[] GetObjectDetails(int index){
-        return connectedObjectList[index];
+    public ConnectedObject(String objName, String objIndex, String objCdeType, String objIpAddress, String objIpPort, String objPassword, String objIconType ){
+        objectName = objName;
+        objectIndex = objIndex;
+        cdeType = objCdeType;
+        ipAddress = objIpAddress;
+        ipPort = objIpPort;
+        password = objPassword;
+        iconType = objIconType;
     }
+
+
+    int GetId(){
+        return id;
+    }
+
+    void SetId(int objId){
+        id = objId;
+    }
+
+    String GetObjectName(){
+        return objectName;
+    }
+
+    void SetObjectName(String objName){
+        objectName = objName;
+    }
+
+    String GetObjectIndex(){
+        return objectIndex;
+    }
+
+    void SetObjectIndex(String objIndex){
+        objectIndex = objIndex;
+    }
+
+    String GetObjectCdeType(){
+        return cdeType;
+    }
+
+    void SetObjectCdeType(String objCdeType){
+        cdeType = objCdeType;
+    }
+
+    String GetObjectIpAddress(){
+        return ipAddress;
+    }
+
+    void SetObjectIpAddress(String objIpAddress){
+        ipAddress = objIpAddress;
+    }
+
+    String GetObjectIpPort(){
+        return ipPort;
+    }
+
+    void SetObjectIpPort(String objIpPort){
+        ipPort = objIpPort;
+    }
+
+    String GetObjectPassword(){
+        return password;
+    }
+
+    void SetObjectPassword(String objPassword){
+        password = objPassword;
+    }
+
+    String GetObjectIconType(){
+        return iconType;
+    }
+
+    void SetObjectIconType(String objIconType){
+        iconType = objIconType;
+    }
+
 }

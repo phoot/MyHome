@@ -22,6 +22,16 @@
     <string name="device_ip_address_set_scr">IP Address</string>
     <string name="device_port_set_scr">IP Port</string>
     <string name="device_psw_set_scr">Password</string>
+    <string name="device_icon_type_set_scr">Icon Type</string>
     <string name="save_setting_scr">Save</string>
+    <string name="delete_setting_scr">Delete</string>
+
+    // spinner array for icons
+    <string-array name="icons_array">
+        <item>Door</item>
+        <item>Plug</item>
+        <item>Lamp</item>
+        <item>Default</item>
+    </string-array>
 
 </resources>

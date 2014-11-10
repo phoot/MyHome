@@ -8,14 +8,16 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-/**
- * Created by philippe on 05/10/2014.
- */
+
 public class MonAdaptateurDeListe extends ArrayAdapter<String> {
 
+    // default available icons
     private Integer[] tab_images_pour_la_liste = {
             R.drawable.portail,
-            R.drawable.prise};
+            R.drawable.prise,
+            R.drawable.lampe,
+            R.drawable.deficon,};
+
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -29,8 +31,24 @@ public class MonAdaptateurDeListe extends ArrayAdapter<String> {
 
         textView.setText(getItem(position));
 
-        if(convertView == null )
-            imageView.setImageResource(tab_images_pour_la_liste[position]);
+        // get the icon from bdd
+        DeviceBdd mySettingBdd = new DeviceBdd(getContext());
+        mySettingBdd.open();
+        ConnectedObject myObject= new ConnectedObject();
+
+        myObject = mySettingBdd.getObjectWithId(position);
+        mySettingBdd.close();
+
+        if(convertView == null ) {
+            // get icon id of the connected object
+            int myIcon = Integer.parseInt(myObject.GetObjectIconType());
+
+            if (myIcon < 3) {
+                imageView.setImageResource(tab_images_pour_la_liste[myIcon]);
+            }else{
+                imageView.setImageResource(tab_images_pour_la_liste[3]);
+            }
+        }
         else
             rowView = (View)convertView;
 
