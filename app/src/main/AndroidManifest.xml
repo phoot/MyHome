@@ -3,7 +3,8 @@
     xmlns:activity="http://schemas.android.com/apk/res-auto"
     package="fr.oxilea.myhome">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:allowBackup="true"

@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class ActivitySetting extends Activity {
@@ -110,6 +111,20 @@ public class ActivitySetting extends Activity {
         if (currentEditedId == -1) {
             // save new device with Index value equals numRows
             numRows = c.getCount();
+
+            // free version allow only 2 devices
+            /*if (numRows>=2){
+                Toast.makeText(getApplicationContext(), R.string.limited_version, Toast.LENGTH_SHORT).show();
+
+                // close BDD
+                mySettingBdd.close();
+
+                // exit setting activity
+                finish();
+
+                // exit from method
+                return;
+            }*/
         }
         else
         {

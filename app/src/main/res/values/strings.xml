@@ -3,6 +3,11 @@
     // App name
     <string name="app_name">MyHome</string>
 
+    // feedback messages
+    <string name="wrong_psw">Wrong Password</string>
+    <string name="no_network">No Network</string>
+    <string name="limited_version">Max 2 devices in free version</string>
+
     // setting menu
     <string name="action_edit">Edit Mode</string>
     <string name="action_settings">Add Device</string>
@@ -11,8 +16,8 @@
     // about screen
     <string name="title_about_scr">About</string>
     <string name="about_text_app">My Home</string>
-    <string name="about_text_dev">Developped by Oxylea</string>
-    <string name="about_text_date">Since 2014</string>
+    <string name="about_text_dev">By Oxilea</string>
+    <string name="about_text_date"> 2014</string>
 
     // setting screen
     <string name="title_setting_scr">New device</string>

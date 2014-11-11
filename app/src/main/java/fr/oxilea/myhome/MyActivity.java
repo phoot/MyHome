@@ -2,7 +2,10 @@ package fr.oxilea.myhome;
 
 import android.app.ActionBar;
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
@@ -163,36 +166,67 @@ public class MyActivity extends ListActivity {
         }
     }
 
-        @Override
+   /*
+   ** check network status
+    */
+
+    public boolean isNetworkOnline() {
+        boolean status=false;
+        try{
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo netInfo = cm.getNetworkInfo(0);
+            if (netInfo != null && netInfo.getState()==NetworkInfo.State.CONNECTED) {
+                status= true;
+            }else {
+                netInfo = cm.getNetworkInfo(1);
+                if(netInfo!=null && netInfo.getState()==NetworkInfo.State.CONNECTED)
+                    status= true;
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            return false;
+        }
+        return status;
+    }
+
+    @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
 
-        if (editMode)
-        {
-            //enter edit mode for the item selected
-            // create setting activity
-            Intent intent;
-            intent = new Intent(MyActivity.this, ActivitySetting.class);
+            if (editMode) {
+                //enter edit mode for the item selected
+                // create setting activity
+                Intent intent;
+                intent = new Intent(MyActivity.this, ActivitySetting.class);
 
-            // transmit the id
-            intent.putExtra("Id", position);
-            startActivity(intent);
-
-
-        }else {
-
-            // retrieve the object definition, (corresponding to the list Item click (line position +1 in BDD)
-            DeviceBdd mySettingBdd = new DeviceBdd(this);
-            mySettingBdd.open();
-            myCurrentObject= new ConnectedObject();
-            myCurrentObject = mySettingBdd.getObjectWithId(position);
-            mySettingBdd.close();
-
-            // Display feedback to the user, ie the object name
-            Toast.makeText(this, myCurrentObject.GetObjectName(), Toast.LENGTH_SHORT).show();
+                // transmit the id
+                intent.putExtra("Id", position);
+                startActivity(intent);
 
 
-            // send relay command
-            new SetRelayOnTask(position).execute();
+            } else {
+
+                // check if network available
+                if(isNetworkOnline()) {
+
+                    // retrieve the object definition, (corresponding to the list Item click (line position +1 in BDD)
+                    DeviceBdd mySettingBdd = new DeviceBdd(this);
+                    mySettingBdd.open();
+                    myCurrentObject = new ConnectedObject();
+                    myCurrentObject = mySettingBdd.getObjectWithId(position);
+                    mySettingBdd.close();
+
+                    // Display feedback to the user, ie the object name
+                    Toast.makeText(this, myCurrentObject.GetObjectName(), Toast.LENGTH_SHORT).show();
+
+
+                    // send relay command
+                    new SetRelayOnTask(position).execute();
+                }
+                else
+                {
+                    // give feedback to the user he needs to activate network
+                    Toast.makeText(this, R.string.no_network, Toast.LENGTH_SHORT).show();
+                }
         }
     }
 
@@ -254,6 +288,14 @@ public class MyActivity extends ListActivity {
                     sTcpClient.SendOverTCP(CDE_SWITCH_RELAY_MESSAGE, true);
                 }
                 sTcpClient.CloseSocket();
+            }else
+            {
+                // wrong password display feedback to the user (on main thread)
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), R.string.wrong_psw, Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
             return "ok";
         }
