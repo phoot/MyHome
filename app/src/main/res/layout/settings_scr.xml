@@ -96,7 +96,31 @@
         android:layout_marginTop="5dp"
         android:inputType="number" />
 
-    <TextView
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/device_login_set_scr"
+            android:id="@+id/textViewDeviceLogin"
+            android:layout_gravity="left"
+            android:layout_marginLeft="20dp"
+            android:textSize="@dimen/text_setting_scr"
+            android:textStyle="bold"
+            android:layout_marginTop="5dp" />
+
+        <EditText
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:inputType="textNoSuggestions"
+            android:ems="5"
+            android:id="@+id/editSettingLogin"
+            android:maxWidth="200dp"
+            android:minWidth="200dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:maxLength="12"
+            android:layout_gravity="left" />
+
+        <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/device_psw_set_scr"
@@ -117,7 +141,7 @@
         android:minWidth="200dp"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="5dp"
-        android:maxLength="5"
+        android:maxLength="12"
         android:layout_gravity="left" />
 
     <TextView
@@ -140,9 +164,35 @@
         android:layout_marginLeft="20dp"
         android:layout_marginTop="5dp"
         android:layout_gravity="left" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/device_protocol_type_set_scr"
+            android:id="@+id/textViewProtocolType"
+            android:layout_gravity="left"
+            android:layout_marginLeft="20dp"
+            android:textSize="@dimen/text_setting_scr"
+            android:textStyle="bold"
+            android:layout_marginTop="5dp" />
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinnerProtocol"
+            android:maxWidth="200dp"
+            android:minWidth="200dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_gravity="left" />
+
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="fill_parent">
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

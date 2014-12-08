@@ -30,6 +30,10 @@ public class ActivitySetting extends Activity {
         Spinner spinner = (Spinner) findViewById(R.id.spinnerIcon);
         String iconType="0";
 
+        // manage spinner for protocol type
+        Spinner spinnerProtocol = (Spinner) findViewById(R.id.spinnerProtocol);
+        String protocolType="0";
+
         if (currentEditedId != -1){
             // this is an update of an already defined setting, should retrieve data from BDD
             DeviceBdd mySettingBdd = new DeviceBdd(this);
@@ -55,13 +59,22 @@ public class ActivitySetting extends Activity {
             myTextView = (TextView) findViewById(R.id.editTextDevicePort);
             myTextView.setText(myObject.GetObjectIpPort());
 
+            myTextView = (TextView) findViewById(R.id.editSettingLogin);
+            myTextView.setText(myObject.GetObjectLogin());
+
             myTextView = (TextView) findViewById(R.id.editSettingPsw);
             myTextView.setText(myObject.GetObjectPassword());
 
-            // set the current spinner value
+            // set the current icon spinner value
             iconType = myObject.GetObjectIconType();
+
+            // set the current protocol spinner value
+            protocolType = myObject.GetObjectProtocol();
+
+
         }
 
+        // Icon spinner
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.icons_array, android.R.layout.simple_spinner_item);
@@ -74,6 +87,22 @@ public class ActivitySetting extends Activity {
 
         int iconIndex = Integer.parseInt(iconType);
         spinner.setSelection(iconIndex);
+
+        // Same for protocol spinner
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapterP = ArrayAdapter.createFromResource(this,
+                R.array.protocol_array, android.R.layout.simple_spinner_item);
+
+        // Specify the layout to use when the list of choices appears
+        adapterP.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Apply the adapter to the spinner
+        spinnerProtocol.setAdapter(adapterP);
+
+        int protocolIndex = Integer.parseInt(protocolType);
+        spinnerProtocol.setSelection(protocolIndex);
+
+
     }
 
 
@@ -95,12 +124,19 @@ public class ActivitySetting extends Activity {
         myTextView = (TextView) findViewById(R.id.editTextDevicePort);
         String deviceDevicePort = myTextView.getText().toString();
 
+        myTextView = (TextView) findViewById(R.id.editSettingLogin);
+        String deviceDeviceLogin = myTextView.getText().toString();
+
         myTextView = (TextView) findViewById(R.id.editSettingPsw);
         String deviceDevicePsw = myTextView.getText().toString();
 
         // manage spinner for icon type
         Spinner spinner = (Spinner) findViewById(R.id.spinnerIcon);
         String deviceDeviceIcon = String.valueOf(spinner.getSelectedItemPosition());
+
+        // manage spinner for protocol type
+        Spinner spinnerP = (Spinner) findViewById(R.id.spinnerProtocol);
+        String deviceDeviceProtocol = String.valueOf(spinnerP.getSelectedItemPosition());
 
         DeviceBdd mySettingBdd = new DeviceBdd(this);
         mySettingBdd.open();
@@ -134,7 +170,7 @@ public class ActivitySetting extends Activity {
 
         String deviceIndex = String.valueOf(numRows);
 
-        ConnectedObject myObject= new ConnectedObject(deviceName, deviceIndex, deviceCdeType, deviceDeviceAdd, deviceDevicePort, deviceDevicePsw, deviceDeviceIcon);
+        ConnectedObject myObject= new ConnectedObject(deviceName, deviceIndex, deviceCdeType, deviceDeviceAdd, deviceDevicePort, deviceDeviceLogin, deviceDevicePsw, deviceDeviceIcon, deviceDeviceProtocol);
 
         if (currentEditedId == -1) {
                 // this is a new object creation}

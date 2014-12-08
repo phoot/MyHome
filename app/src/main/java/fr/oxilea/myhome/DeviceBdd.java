@@ -24,10 +24,15 @@ public class DeviceBdd {
     private static final int NUM_COL_OBJECT_IP_ADDRESS=4;
     private static final String COL_OBJECT_IP_PORT="Object_IP_Port";
     private static final int NUM_COL_OBJECT_IP_PORT=5;
+    private static final String COL_OBJECT_LOGIN="Object_login";
+    private static final int NUM_COL_OBJECT_LOGIN=6;
     private static final String COL_OBJECT_PSW="Object_password";
-    private static final int NUM_COL_OBJECT_PSW=6;
+    private static final int NUM_COL_OBJECT_PSW=7;
     private static final String COL_OBJECT_ICON="Object_Icon";
-    private static final int NUM_COL_OBJECT_ICON=7;
+    private static final int NUM_COL_OBJECT_ICON=8;
+    private static final String COL_OBJECT_PROTOCOL="Object_Protocol";
+    private static final int NUM_COL_OBJECT_PROTOCOL=9;
+
 
     private SQLiteDatabase bdd;
 
@@ -63,8 +68,10 @@ public class DeviceBdd {
         values.put(COL_OBJECT_CDETYPE, myConnectedObjet.GetObjectCdeType());
         values.put(COL_OBJECT_IP_ADDRESS, myConnectedObjet.GetObjectIpAddress());
         values.put(COL_OBJECT_IP_PORT, myConnectedObjet.GetObjectIpPort());
+        values.put(COL_OBJECT_LOGIN, myConnectedObjet.GetObjectLogin());
         values.put(COL_OBJECT_PSW, myConnectedObjet.GetObjectPassword());
         values.put(COL_OBJECT_ICON, myConnectedObjet.GetObjectIconType());
+        values.put(COL_OBJECT_PROTOCOL, myConnectedObjet.GetObjectProtocol());
 
         //insert in database
         return bdd.insert(SETTING_TABLE, null, values);
@@ -78,8 +85,10 @@ public class DeviceBdd {
         values.put(COL_OBJECT_CDETYPE, myConnectedObjet.GetObjectCdeType());
         values.put(COL_OBJECT_IP_ADDRESS, myConnectedObjet.GetObjectIpAddress());
         values.put(COL_OBJECT_IP_PORT, myConnectedObjet.GetObjectIpPort());
+        values.put(COL_OBJECT_LOGIN, myConnectedObjet.GetObjectLogin());
         values.put(COL_OBJECT_PSW, myConnectedObjet.GetObjectPassword());
         values.put(COL_OBJECT_ICON, myConnectedObjet.GetObjectIconType());
+        values.put(COL_OBJECT_PROTOCOL, myConnectedObjet.GetObjectProtocol());
 
         return bdd.update(SETTING_TABLE, values, COL_OBJECT_INDEX + " = " +id, null);
     }
@@ -91,7 +100,7 @@ public class DeviceBdd {
 
     public ConnectedObject getObjectWithId(int id){
         // get full object definition
-        Cursor c = bdd.query(SETTING_TABLE, new String[] {ID, COL_OBJECT_NAME, COL_OBJECT_INDEX, COL_OBJECT_CDETYPE, COL_OBJECT_IP_ADDRESS, COL_OBJECT_IP_PORT, COL_OBJECT_PSW, COL_OBJECT_ICON}, COL_OBJECT_INDEX + " LIKE \"" + id +"\"", null, null, null, null);
+        Cursor c = bdd.query(SETTING_TABLE, new String[] {ID, COL_OBJECT_NAME, COL_OBJECT_INDEX, COL_OBJECT_CDETYPE, COL_OBJECT_IP_ADDRESS, COL_OBJECT_IP_PORT, COL_OBJECT_LOGIN, COL_OBJECT_PSW, COL_OBJECT_ICON, COL_OBJECT_PROTOCOL}, COL_OBJECT_INDEX + " LIKE \"" + id +"\"", null, null, null, null);
         return cursorToConnectedObject(c);
     }
 
@@ -114,8 +123,10 @@ public class DeviceBdd {
             myObj.SetObjectCdeType(c.getString(NUM_COL_OBJECT_CDETYPE));
             myObj.SetObjectIpAddress(c.getString(NUM_COL_OBJECT_IP_ADDRESS));
             myObj.SetObjectIpPort(c.getString(NUM_COL_OBJECT_IP_PORT));
+            myObj.SetObjectLogin(c.getString(NUM_COL_OBJECT_LOGIN));
             myObj.SetObjectPassword(c.getString(NUM_COL_OBJECT_PSW));
             myObj.SetObjectIconType(c.getString(NUM_COL_OBJECT_ICON));
+            myObj.SetObjectProtocol(c.getString(NUM_COL_OBJECT_PROTOCOL));
 
             // set the new index using the old one
             myObj.SetObjectIndex(String.valueOf(i));
@@ -147,8 +158,10 @@ public class DeviceBdd {
         myObj.SetObjectCdeType(c.getString(NUM_COL_OBJECT_CDETYPE));
         myObj.SetObjectIpAddress(c.getString(NUM_COL_OBJECT_IP_ADDRESS));
         myObj.SetObjectIpPort(c.getString(NUM_COL_OBJECT_IP_PORT));
+        myObj.SetObjectLogin(c.getString(NUM_COL_OBJECT_LOGIN));
         myObj.SetObjectPassword(c.getString(NUM_COL_OBJECT_PSW));
         myObj.SetObjectIconType(c.getString(NUM_COL_OBJECT_ICON));
+        myObj.SetObjectProtocol(c.getString(NUM_COL_OBJECT_PROTOCOL));
 
         //Close the cursor
         c.close();

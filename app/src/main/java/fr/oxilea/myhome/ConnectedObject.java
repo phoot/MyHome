@@ -11,8 +11,10 @@ public class ConnectedObject {
     private String cdeType;
     private String ipAddress;
     private String ipPort;
+    private String login;
     private String password;
     private String iconType;
+    private String protocol;
 
 
     /**
@@ -23,14 +25,16 @@ public class ConnectedObject {
 
     }
 
-    public ConnectedObject(String objName, String objIndex, String objCdeType, String objIpAddress, String objIpPort, String objPassword, String objIconType ){
+    public ConnectedObject(String objName, String objIndex, String objCdeType, String objIpAddress, String objIpPort, String objLogin, String objPassword, String objIconType, String objProtocol ){
         objectName = objName;
         objectIndex = objIndex;
         cdeType = objCdeType;
         ipAddress = objIpAddress;
         ipPort = objIpPort;
+        login = objLogin;
         password = objPassword;
         iconType = objIconType;
+        protocol = objProtocol;
     }
 
 
@@ -82,6 +86,14 @@ public class ConnectedObject {
         ipPort = objIpPort;
     }
 
+    String GetObjectLogin(){
+        return login;
+    }
+
+    void SetObjectLogin(String objLogin){
+        login = objLogin;
+    }
+
     String GetObjectPassword(){
         return password;
     }
@@ -96,6 +108,14 @@ public class ConnectedObject {
 
     void SetObjectIconType(String objIconType){
         iconType = objIconType;
+    }
+
+    String GetObjectProtocol(){
+        return protocol;
+    }
+
+    void SetObjectProtocol(String objProtocol){
+        protocol = objProtocol;
     }
 
 }

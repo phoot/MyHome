@@ -29,6 +29,11 @@ public class MyActivity extends ListActivity {
     public static final byte[] CDE_OFF_RELAY_MESSAGE = {0x55, (byte) 0xaa, 0x00, 0x03, 0x00, 0x01, 0x01, 0x05};
     public static final byte[] CDE_SWITCH_RELAY_MESSAGE = {0x55, (byte) 0xaa, 0x00, 0x03, 0x00, 0x03, 0x01, 0x07};
 
+    // supported protocol
+    public static final int LONHAND_PROTOCOL=0;
+    public static final int MAGINON_PROTOCOL=1;
+
+
     // psw hex => 62 37 65 62 38
     // psw str =>  "xxxxx"
     // psw command => psw (bytes) + 0x0d, 0x0a
@@ -127,13 +132,13 @@ public class MyActivity extends ListActivity {
                 // id = 0 new device creation
                 intent.putExtra("Id",-1);
                 startActivity(intent);
-                return true;
+               break;
 
             case R.id.action_about:
                 // create about activity
                 intent = new Intent(MyActivity.this, ActivityAbout.class);
                 startActivity(intent);
-                return true;
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -157,12 +162,12 @@ public class MyActivity extends ListActivity {
                     bar.setBackgroundDrawable(getResources().getDrawable(R.drawable.action_bar_red_bg));
                 }
 
-            return;
+            break;
 
             case R.id.action_settings:
             case R.id.action_about:
                 //nothing to do right now
-            return;
+            break;
         }
     }
 
@@ -244,58 +249,127 @@ public class MyActivity extends ListActivity {
 
         public String doInBackground(Void... params) {
 
+            switch (Integer.valueOf(myCurrentObject.GetObjectProtocol())) {
+                case LONHAND_PROTOCOL:
 
-            // object definition retrieved from myCurrentObject
-            // connect socket on device IP address and Port
-            String ipPortStr = myCurrentObject.GetObjectIpPort();
-            int ipPort;
+                    // object definition retrieved from myCurrentObject
+                    // connect socket on device IP address and Port
+                    String ipPortStr = myCurrentObject.GetObjectIpPort();
+                    int ipPort;
 
-            // check if string has only digits
-            if (Pattern.matches("[0-9]+", ipPortStr))
-                ipPort = Integer.parseInt(ipPortStr);
-            else
-            ipPort =0;
+                    // check if string has only digits
+                    if (Pattern.matches("[0-9]+", ipPortStr))
+                        ipPort = Integer.parseInt(ipPortStr);
+                    else
+                        ipPort = 0;
 
-            TCPClient sTcpClient = new TCPClient(myCurrentObject.GetObjectIpAddress(), ipPort);
+                    TCPClient sTcpClient = new TCPClient(myCurrentObject.GetObjectIpAddress(), ipPort);
 
-            // send password over TCP socket just connected
-            // get the password and format the command for the device
-            String pwd = myCurrentObject.GetObjectPassword();
-            int pwdLength = pwd.length();
-            int i=0;
-            while (i < pwdLength) {
-                PASSWORD_RELAY_MESSAGE[i]=(byte)pwd.charAt(i);
-                i++;
-            }
-            // psw end with 0x0d, 0x0a
-            PASSWORD_RELAY_MESSAGE[i++]=(byte)0x0d;
-            PASSWORD_RELAY_MESSAGE[i]=(byte)0x0a;
-
-            String retStatus=sTcpClient.SendOverTCP(PASSWORD_RELAY_MESSAGE, true);
-
-            // check if password is correct (return OK)
-            if (retStatus.equals("OK")) {
-                // check if pulse command
-                if (myCurrentObject.GetObjectCdeType().equals("1")) {
-                    sTcpClient.SendOverTCP(CDE_ON_RELAY_MESSAGE, true);
-                    try {
-                        Thread.sleep(300);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    // send password over TCP socket just connected
+                    // get the password and format the command for the device
+                    String pwd = myCurrentObject.GetObjectPassword();
+                    int pwdLength = pwd.length();
+                    int i = 0;
+                    while (i < pwdLength) {
+                        PASSWORD_RELAY_MESSAGE[i] = (byte) pwd.charAt(i);
+                        i++;
                     }
-                    sTcpClient.SendOverTCP(CDE_OFF_RELAY_MESSAGE, true);
-                }else{
-                    sTcpClient.SendOverTCP(CDE_SWITCH_RELAY_MESSAGE, true);
-                }
-                sTcpClient.CloseSocket();
-            }else
-            {
-                // wrong password display feedback to the user (on main thread)
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(getApplicationContext(), R.string.wrong_psw, Toast.LENGTH_SHORT).show();
+                    // psw end with 0x0d, 0x0a
+                    PASSWORD_RELAY_MESSAGE[i++] = (byte) 0x0d;
+                    PASSWORD_RELAY_MESSAGE[i] = (byte) 0x0a;
+
+                    String retStatus = sTcpClient.SendOverTCP(PASSWORD_RELAY_MESSAGE, true);
+
+                    // check if password is correct (return OK)
+                    if (retStatus.equals("OK")) {
+                        // check if pulse command
+                        if (myCurrentObject.GetObjectCdeType().equals("1")) {
+                            sTcpClient.SendOverTCP(CDE_ON_RELAY_MESSAGE, true);
+                            try {
+                                Thread.sleep(300);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            sTcpClient.SendOverTCP(CDE_OFF_RELAY_MESSAGE, true);
+                        } else {
+                            sTcpClient.SendOverTCP(CDE_SWITCH_RELAY_MESSAGE, true);
+                        }
+                        sTcpClient.CloseSocket();
+                    } else {
+                        // wrong password display feedback to the user (on main thread)
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), R.string.wrong_psw, Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
-                });
+                    break;
+
+                case MAGINON_PROTOCOL:
+                    HTTPClient sHttpClient= new HTTPClient();
+
+                    // serveur de test online pour recuperer les info de son POST
+                    //String httpAdd = "http://posttestserver.com/post.php";
+
+                    // check status of the plug
+                    String httpStatusAdd="http://"+myCurrentObject.GetObjectIpAddress()+":"+myCurrentObject.GetObjectIpPort()+"/adm/system_command.asp";
+                    String retContent = sHttpClient.connectGet(httpStatusAdd, myCurrentObject.GetObjectLogin(), myCurrentObject.GetObjectPassword());
+
+                    // depending on status either switch the plug on or off
+                    String httpAdd = "http://"+myCurrentObject.GetObjectIpAddress()+":"+myCurrentObject.GetObjectIpPort()+"/goform/SystemCommand";
+
+                    // wrong user/password/...  display feedback to the user (on main thread)
+                    if (retContent.contains("Unknown User"))
+                    {
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), R.string.wrong_user, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                    if (retContent.contains("Unknown Password"))
+                    {
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), R.string.wrong_psw, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                    if (retContent.contains("System command"))
+                    {
+                        if (retContent.contains("GPIO1 = [00]")) {
+                            sHttpClient.connectPost(httpAdd, "command", "GpioForCrond 1", myCurrentObject.GetObjectLogin(), myCurrentObject.GetObjectPassword());
+
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(getApplicationContext(), R.string.switch_on, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                        } else /*if (retContent.contains("GPIO1 = [01]")) */ {
+
+                            // force 0 to initialize command return
+                            sHttpClient.connectPost(httpAdd, "command", "GpioForCrond 0", myCurrentObject.GetObjectLogin(), myCurrentObject.GetObjectPassword());
+
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(getApplicationContext(), R.string.switch_off, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+                    else
+                    {
+                            runOnUiThread(new Runnable() {
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), R.string.wrong_access, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                    break;
             }
             return "ok";
         }
